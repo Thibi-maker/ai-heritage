@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Generation - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+    
+    <!-- html2canvas and jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        .report-page {
+            min-height: 100vh;
+            padding: 8rem 1.5rem 4rem;
+            background:
+                radial-gradient(800px 400px at 85% 0%, rgba(74, 124, 140, 0.1), transparent 60%),
+                radial-gradient(700px 350px at 10% 100%, rgba(212, 175, 55, 0.07), transparent 55%),
+                #fafaf8;
+        }
+
+        .report-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .report-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+        }
+
+        .report-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .report-preview {
+            background: #fff;
+            border-radius: 18px;
+            padding: 2.5rem;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 2px rgba(26, 46, 63, 0.04);
+        }
+
+        .report-preview .report-title {
+            font-size: 1.5rem;
+            color: #1a2e3f;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(26, 46, 63, 0.1);
+        }
+
+        /* ---------- IMAGE ANNOTATION SECTION ---------- */
+        .annotation-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 16px;
+            border: 2px solid #1a2e3f;
+        }
+
+        .annotation-section h3 {
+            color: #1a2e3f;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .annotation-section .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .image-annotation-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .image-annotation-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .annotation-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* ---------- DAMAGE LEGEND ---------- */
+        .damage-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e8edf0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .legend-item .color-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-item .info {
+            flex: 1;
+        }
+
+        .legend-item .info .label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .legend-item .info .count {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        /* ---------- DAMAGE STATS ---------- */
+        .damage-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e8edf0;
+        }
+
+        .stat-box .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a2e3f;
+        }
+
+        .stat-box .label {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        /* ---------- REPORT SECTIONS ---------- */
+        .report-section {
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .report-section .label {
+            color: #666;
+            font-size: 0.85rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .report-section .value {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #1a2e3f;
+        }
+
+        .report-section ul {
+            color: #555;
+            padding-left: 1.2rem;
+            margin-top: 0.3rem;
+            line-height: 2;
+        }
+
+        .report-section ul li {
+            color: #555;
+        }
+
+        .report-section p {
+            color: #555;
+            line-height: 1.7;
+        }
+
+        /* PDF Report Styles */
+        #pdfReport {
+            display: none;
+            background: #fff;
+            padding: 40px;
+            font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+        }
+
+        #pdfReport .pdf-header {
+            text-align: center;
+            padding: 20px 0 30px;
+            border-bottom: 3px solid #1a2e3f;
+            margin-bottom: 30px;
+        }
+
+        #pdfReport .pdf-header h1 {
+            color: #1a2e3f;
+            font-size: 28px;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        #pdfReport .pdf-header p {
+            color: #666;
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
+        #pdfReport .pdf-section {
+            margin-bottom: 20px;
+            padding: 5px 0;
+        }
+
+        #pdfReport .pdf-section .label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            font-weight: 600;
+        }
+
+        #pdfReport .pdf-section .value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a2e3f;
+        }
+
+        #pdfReport .pdf-section ul {
+            color: #333;
+            padding-left: 20px;
+            margin: 5px 0;
+            line-height: 2;
+        }
+
+        #pdfReport .pdf-section ul li {
+            color: #333;
+        }
+
+        #pdfReport .pdf-section p {
+            color: #333;
+            line-height: 1.7;
+            margin: 5px 0;
+        }
+
+        #pdfReport .pdf-footer {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 12px;
+        }
+
+        #pdfReport .pdf-footer p {
+            margin: 5px 0;
+            color: #999;
+        }
+
+        #pdfReport .pdf-image-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #pdfReport .pdf-image-section img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #pdfReport .pdf-image-section .caption {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* ---------- BUTTONS ---------- */
+        .report-download {
+            text-align: center;
+            padding: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            position: relative;
+            overflow: hidden;
+            padding: 1.1rem 3.2rem;
+            background: linear-gradient(135deg, #1a2e3f 0%, #4a7c8c 60%, #d4af37 130%);
+            background-size: 200% 200%;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 0 0 rgba(212, 175, 55, 0), 0 8px 24px rgba(26, 46, 63, 0.3);
+            animation: btnGlow 3s ease-in-out infinite, btnGradientShift 6s ease infinite;
+        }
+
+        @keyframes btnGlow {
+            0%, 100% { box-shadow: 0 0 0 rgba(212, 175, 55, 0), 0 8px 24px rgba(26, 46, 63, 0.3); }
+            50% { box-shadow: 0 0 28px rgba(212, 175, 55, 0.55), 0 8px 32px rgba(26, 46, 63, 0.4); }
+        }
+
+        @keyframes btnGradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .btn-download::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            transform: skewX(-20deg);
+            animation: shine 2.8s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -120%; }
+            60%, 100% { left: 160%; }
+        }
+
+        .btn-download:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.7), 0 14px 36px rgba(26, 46, 63, 0.45);
+        }
+
+        .btn-download:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.75;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-download:disabled::before {
+            display: none;
+        }
+
+        .btn-analyze-another {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: #1a2e3f;
+            border: 2px solid #1a2e3f;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .btn-analyze-another:hover {
+            background: #1a2e3f;
+            color: #fff;
+        }
+
+        /* ---------- LOADING ---------- */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-overlay .spinner {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-overlay p {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #1a2e3f;
+        }
+
+        .loading-overlay .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: #e8edf0;
+            border-radius: 6px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .loading-overlay .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: #1a2e3f;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ---------- PDF PROGRESS MODAL ---------- */
+        .pdf-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(10, 18, 26, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pdf-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .pdf-modal-card {
+            width: 90%;
+            max-width: 440px;
+            background: linear-gradient(160deg, #ffffff, #f0f4f8);
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+            transform: scale(0.85);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pdf-modal.show .pdf-modal-card {
+            transform: scale(1);
+        }
+
+        .pdf-modal-card .ring {
+            position: relative;
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 1.2rem;
+        }
+
+        .pdf-modal-card .ring::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 5px solid rgba(26, 46, 63, 0.12);
+        }
+
+        .pdf-modal-card .ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top-color: #d4af37;
+            border-right-color: #4a7c8c;
+            animation: spin 1.2s linear infinite;
+        }
+
+        .pdf-modal-card .ring i {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            color: #1a2e3f;
+            animation: floatIcon 2s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .pdf-modal-card h3 {
+            color: #1a2e3f;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+        }
+
+        .pdf-modal-card .status {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.4rem;
+            min-height: 1.5em;
+            font-weight: 500;
+        }
+
+        .pdf-modal-card .progress-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(26, 46, 63, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pdf-modal-card .progress-track .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1a2e3f, #4a7c8c, #d4af37);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            animation: progressShift 2s linear infinite;
+            transition: width 0.4s ease;
+        }
+
+        @keyframes progressShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .pdf-modal-card .progress-pct {
+            margin-top: 0.6rem;
+            font-weight: 800;
+            color: #1a2e3f;
+            font-size: 1.3rem;
+        }
+
+        .pdf-modal-card .sparkles {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            font-size: 1.1rem;
+            animation: twinkle 1.6s ease-in-out infinite;
+        }
+
+        .pdf-modal-card .sparkles.one { top: 1rem; right: 1.2rem; }
+        .pdf-modal-card .sparkles.two { top: 2rem; left: 1.2rem; animation-delay: 0.5s; }
+        .pdf-modal-card .sparkles.three { bottom: 1.4rem; right: 1.6rem; animation-delay: 0.9s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* Success state */
+        .pdf-modal-card.success .ring::before,
+        .pdf-modal-card.success .ring::after {
+            border-color: #28a745;
+            border-top-color: #28a745;
+            border-right-color: #6bcf7f;
+            animation: none;
+        }
+
+        .pdf-modal-card.success .ring::after {
+            border: 5px solid #28a745;
+        }
+
+        .pdf-modal-card.success .ring i {
+            color: #28a745;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: -12px;
+            z-index: 2001;
+            width: 10px;
+            height: 16px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .confetti.fall {
+            animation: confettiFall 3s ease-in forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(110vh) rotate(720deg);
+            }
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
+            .report-download {
+                flex-direction: column;
+                align-items: center;
+            }
+            .report-header h1 {
+                font-size: 2rem;
+            }
+            .report-preview {
+                padding: 1.5rem;
+            }
+            .damage-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .damage-legend {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+            if (!session || !session.token || !session.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+    </script>
+
+    <header id="header" class="no-print">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="upload.html" class="active">Upload</a></li>
+                <li><a href="database.html">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="report-page">
+        <div class="report-container">
+            <div class="report-header no-print">
+                <h1>Report <span class="gradient-text">Generation</span></h1>
+                <p>AI-powered damage detection with automatic crack marking</p>
+            </div>
+
+            <!-- Report Preview -->
+            <div class="report-preview" id="reportPreview">
+                <div class="report-title no-print">
+                    <i class="fas fa-file-alt" style="color:#1a2e3f;"></i> 
+                    Heritage Preservation Report
+                </div>
+
+                <!-- Report Content -->
+                <div id="reportContent">
+                    <!-- Image Annotation Section -->
+                    <div class="annotation-section">
+                        <h3><i class="fas fa-robot"></i> AI Damage Detection</h3>
+                        <p class="subtitle">Automatically detected cracks and structural damage marked on the monument</p>
+
+                        <div class="image-annotation-container">
+                            <div class="loading-overlay" id="loadingOverlay">
+                                <span class="spinner">⚙️</span>
+                                <p>AI is analyzing the image...</p>
+                                <div class="progress-bar">
+                                    <div class="fill" id="progressFill"></div>
+                                </div>
+                            </div>
+
+                            <img id="annotationImage" 
+                                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='500'%3E%3Crect fill='%23d4c5a9' width='700' height='500'/%3E%3Ctext x='50%25' y='45%25' text-anchor='middle' dominant-baseline='central' font-size='70' font-family='Arial' fill='%2380695c'%3E%F0%9F%8F%9B%EF%B8%8F%3C/text%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='22' font-family='Arial' fill='%23666666'%3ETaj Mahal - Click Analyze to detect cracks%3C/text%3E%3C/svg%3E" 
+                                 alt="Heritage Monument" />
+                            <canvas id="annotationCanvas" class="annotation-canvas"></canvas>
+                        </div>
+
+                        <!-- Damage Stats -->
+                        <div class="damage-stats" id="damageStats">
+                            <div class="stat-box">
+                                <div class="number" id="totalCracks">0</div>
+                                <div class="label">Total Cracks Detected</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="number" id="criticalCount">0</div>
+                                <div class="label">Critical Severity</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="number" id="moderateCount">0</div>
+                                <div class="label">Moderate Severity</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="number" id="minorCount">0</div>
+                                <div class="label">Minor Severity</div>
+                            </div>
+                        </div>
+
+                        <!-- Damage Legend -->
+                        <div class="damage-legend" id="damageLegend">
+                            <div class="legend-item">
+                                <div class="color-box" style="background: #ff0000;"></div>
+                                <div class="info">
+                                    <div class="label">🔴 Critical Cracks</div>
+                                    <div class="count" id="criticalLabel">0 detected</div>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box" style="background: #ff8c00;"></div>
+                                <div class="info">
+                                    <div class="label">🟠 Major Cracks</div>
+                                    <div class="count" id="majorLabel">0 detected</div>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box" style="background: #ffd700;"></div>
+                                <div class="info">
+                                    <div class="label">🟡 Moderate Cracks</div>
+                                    <div class="count" id="moderateLabel">0 detected</div>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box" style="background: #32cd32;"></div>
+                                <div class="info">
+                                    <div class="label">🟢 Minor Cracks</div>
+                                    <div class="count" id="minorLabel">0 detected</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="no-print" style="text-align: center; margin-top: 1rem;">
+                            <button class="btn-primary" onclick="runAIAnalysis()" id="analyzeBtn">
+                                <i class="fas fa-robot"></i> Run AI Damage Detection
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report Details -->
+                    <div class="report-section">
+                        <span class="label">Report ID</span>
+                        <span class="value">#HR-2026-00842</span>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Monument Name</span>
+                        <span class="value">Taj Mahal</span>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Location</span>
+                        <span class="value">Agra, Uttar Pradesh, India</span>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Analysis Date</span>
+                        <span class="value" id="analysisDate">August 6, 2026</span>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">AI Confidence Score</span>
+                        <span class="value" style="color:#1a2e3f; font-weight:700;">94.7%</span>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Damage Severity</span>
+                        <span class="value" style="color:#fd7e14; font-weight:700;" id="overallSeverity">⚠️ High</span>
+                    </div>
+
+                    <div class="report-section" id="detectedIssues">
+                        <span class="label">Detected Issues</span>
+                        <ul>
+                            <li>Surface cracks detected in <span id="crackCount">0</span> locations</li>
+                            <li>Structural erosion in 3 areas</li>
+                            <li>Weathering patterns identified</li>
+                            <li>Material degradation observed</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Preservation Recommendations</span>
+                        <ul>
+                            <li>Immediate structural reinforcement needed</li>
+                            <li>Material analysis for restoration</li>
+                            <li>Schedule regular monitoring</li>
+                            <li>Implement protective measures against weathering</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-section">
+                        <span class="label">Historical Context</span>
+                        <p>
+                            The Taj Mahal, built in 1632 by Mughal Emperor Shah Jahan, is considered one of the finest 
+                            examples of Mughal architecture. It has been a UNESCO World Heritage Site since 1983 and 
+                            attracts millions of visitors annually. Recent AI analysis indicates the need for proactive 
+                            preservation measures to protect this iconic monument.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Progress Modal -->
+            <div class="pdf-modal" id="pdfModal">
+                <div class="pdf-modal-card" id="pdfModalCard">
+                    <span class="sparkles one">✨</span>
+                    <span class="sparkles two">✨</span>
+                    <span class="sparkles three">✨</span>
+                    <div class="ring"><i class="fas fa-file-pdf"></i></div>
+                    <h3>Generating Your Report</h3>
+                    <div class="status" id="pdfStatus">Preparing document...</div>
+                    <div class="progress-track">
+                        <div class="fill" id="pdfProgressFill"></div>
+                    </div>
+                    <div class="progress-pct" id="pdfProgressPct">0%</div>
+                </div>
+            </div>
+
+            <!-- Download Buttons -->
+            <div class="report-download no-print">
+                <button class="btn-download" id="downloadBtn" onclick="generatePDF()">
+                    <i class="fas fa-file-pdf"></i> Download Full PDF Report
+                </button>
+                <a href="upload.html" class="btn-analyze-another">
+                    <i class="fas fa-upload"></i> Analyze Another Image
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ---------- NAVIGATION ----------
+        const header = document.getElementById('header');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) navMenu.classList.remove('active');
+            });
+        });
+
+        // ---------- AI CRACK DETECTION ----------
+        let detectedCracks = [];
+        const canvas = document.getElementById('annotationCanvas');
+        const ctx = canvas.getContext('2d');
+        const image = document.getElementById('annotationImage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const progressFill = document.getElementById('progressFill');
+
+        function setupCanvas() {
+            canvas.width = image.naturalWidth || image.width || 700;
+            canvas.height = image.naturalHeight || image.height || 500;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+        }
+
+        function generateRandomCracks(count) {
+            const cracks = [];
+            const types = ['critical', 'major', 'moderate', 'minor'];
+            const colors = {
+                critical: '#ff0000',
+                major: '#ff8c00',
+                moderate: '#ffd700',
+                minor: '#32cd32'
+            };
+            const labels = {
+                critical: 'Critical Crack',
+                major: 'Major Crack',
+                moderate: 'Moderate Crack',
+                minor: 'Minor Crack'
+            };
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            for (let i = 0; i < count; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const x = 50 + Math.random() * (w - 100);
+                const y = 50 + Math.random() * (h - 100);
+                const radius = 15 + Math.random() * 35;
+                const angle = Math.random() * Math.PI * 2;
+
+                cracks.push({
+                    id: i + 1,
+                    type: type,
+                    color: colors[type],
+                    label: labels[type],
+                    x: x,
+                    y: y,
+                    radius: radius,
+                    angle: angle,
+                    severity: type,
+                    confidence: 75 + Math.random() * 20
+                });
+            }
+            return cracks;
+        }
+
+        function drawCracks(cracks) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            cracks.forEach(crack => {
+                ctx.save();
+                
+                const gradient = ctx.createRadialGradient(
+                    crack.x, crack.y, 0,
+                    crack.x, crack.y, crack.radius * 1.5
+                );
+                gradient.addColorStop(0, crack.color + '40');
+                gradient.addColorStop(1, crack.color + '00');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(crack.x, crack.y, crack.radius * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(crack.x, crack.y, crack.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = crack.color;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.fillStyle = crack.color + '33';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(crack.x - crack.radius * 0.6, crack.y);
+                ctx.lineTo(crack.x + crack.radius * 0.6, crack.y);
+                ctx.moveTo(crack.x, crack.y - crack.radius * 0.6);
+                ctx.lineTo(crack.x, crack.y + crack.radius * 0.6);
+                ctx.strokeStyle = crack.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 8;
+                ctx.font = 'bold 13px "Segoe UI Variable", "Segoe UI", Arial, sans-serif';
+                const labelText = `${crack.label} (${Math.round(crack.confidence)}%)`;
+                ctx.fillText(labelText, crack.x + crack.radius + 10, crack.y + 5);
+                
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px "Segoe UI Variable", "Segoe UI", Arial, sans-serif';
+                ctx.fillText(`#${crack.id}`, crack.x - 8, crack.y + 6);
+
+                ctx.restore();
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(crack.x + crack.radius, crack.y);
+                ctx.lineTo(crack.x + crack.radius + 8, crack.y);
+                ctx.strokeStyle = crack.color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 3]);
+                ctx.stroke();
+                ctx.restore();
+            });
+        }
+
+        function updateStats(cracks) {
+            const total = cracks.length;
+            const critical = cracks.filter(c => c.type === 'critical').length;
+            const major = cracks.filter(c => c.type === 'major').length;
+            const moderate = cracks.filter(c => c.type === 'moderate').length;
+            const minor = cracks.filter(c => c.type === 'minor').length;
+
+            document.getElementById('totalCracks').textContent = total;
+            document.getElementById('criticalCount').textContent = critical;
+            document.getElementById('moderateCount').textContent = moderate;
+            document.getElementById('minorCount').textContent = minor;
+
+            document.getElementById('criticalLabel').textContent = critical + ' detected';
+            document.getElementById('majorLabel').textContent = major + ' detected';
+            document.getElementById('moderateLabel').textContent = moderate + ' detected';
+            document.getElementById('minorLabel').textContent = minor + ' detected';
+
+            document.getElementById('crackCount').textContent = total;
+
+            let severity = 'Low';
+            let color = '#28a745';
+            if (critical > 2) { severity = '⚠️ Critical'; color = '#dc3545'; }
+            else if (critical > 0 || major > 3) { severity = '⚠️ High'; color = '#fd7e14'; }
+            else if (major > 1 || moderate > 5) { severity = '⚠️ Moderate'; color = '#ffc107'; }
+            document.getElementById('overallSeverity').textContent = severity;
+            document.getElementById('overallSeverity').style.color = color;
+        }
+
+        function runAIAnalysis() {
+            loadingOverlay.classList.add('active');
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="spinner" style="display:inline-block; animation: spin 1s linear infinite;">⚙️</span> Analyzing...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress > 100) progress = 100;
+                progressFill.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        const numCracks = 6 + Math.floor(Math.random() * 8);
+                        detectedCracks = generateRandomCracks(numCracks);
+                        drawCracks(detectedCracks);
+                        updateStats(detectedCracks);
+                        
+                        loadingOverlay.classList.remove('active');
+                        analyzeBtn.innerHTML = '<i class="fas fa-robot"></i> Re-run AI Detection';
+                        analyzeBtn.disabled = false;
+                        
+                        localStorage.setItem('crackData', JSON.stringify(detectedCracks));
+                        
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                        document.getElementById('analysisDate').textContent = dateStr;
+                        
+                        console.log(`✅ AI detected ${detectedCracks.length} cracks on the monument`);
+                    }, 300);
+                }
+            }, 100);
+        }
+
+        // ---------- PDF GENERATION ----------
+        const pdfModal = document.getElementById('pdfModal');
+        const pdfModalCard = document.getElementById('pdfModalCard');
+        const pdfStatus = document.getElementById('pdfStatus');
+        const pdfProgressFill = document.getElementById('pdfProgressFill');
+        const pdfProgressPct = document.getElementById('pdfProgressPct');
+
+        const pdfStages = [
+            { at: 10, text: 'Collecting damage analysis data...' },
+            { at: 30, text: 'Compiling preservation recommendations...' },
+            { at: 55, text: 'Rendering annotated monument image...' },
+            { at: 75, text: 'Polishing report layout & styling...' },
+            { at: 90, text: 'Encoding into high-quality PDF...' },
+            { at: 100, text: 'Finalizing your document...' }
+        ];
+
+        function showPdfModal() {
+            pdfModal.classList.add('show');
+            pdfModalCard.classList.remove('success');
+            pdfModalCard.querySelector('.ring i').className = 'fas fa-file-pdf';
+            pdfProgressFill.style.width = '0%';
+            pdfProgressPct.textContent = '0%';
+        }
+
+        function updatePdfProgress(pct) {
+            pct = Math.min(100, Math.round(pct));
+            pdfProgressFill.style.width = pct + '%';
+            pdfProgressPct.textContent = pct + '%';
+            const stage = pdfStages.find(s => pct <= s.at);
+            if (stage) pdfStatus.textContent = stage.text;
+        }
+
+        function hidePdfModal() {
+            pdfModal.classList.remove('show');
+        }
+
+        function launchConfetti() {
+            const colors = ['#d4af37', '#1a2e3f', '#4a7c8c', '#28a745', '#fd7e14', '#e63946'];
+            for (let i = 0; i < 90; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti';
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                piece.style.width = 6 + Math.random() * 10 + 'px';
+                piece.style.height = 8 + Math.random() * 14 + 'px';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                piece.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+                piece.style.animationDelay = Math.random() * 0.4 + 's';
+                document.body.appendChild(piece);
+                requestAnimationFrame(() => piece.classList.add('fall'));
+                setTimeout(() => piece.remove(), 5500);
+            }
+        }
+
+        function animateProgressTo(target, duration, onDone) {
+            const start = parseFloat(pdfProgressFill.style.width) || 0;
+            const startTime = performance.now();
+            function step(now) {
+                const elapsed = now - startTime;
+                const t = Math.min(1, elapsed / duration);
+                const eased = 1 - Math.pow(1 - t, 3);
+                updatePdfProgress(start + (target - start) * eased);
+                if (t < 1) {
+                    requestAnimationFrame(step);
+                } else if (onDone) {
+                    onDone();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        async function generatePDF() {
+            const btn = document.getElementById('downloadBtn');
+            btn.innerHTML = '<span class="spinner" style="display:inline-block; animation: spin 1s linear infinite;">⚙️</span> Generating PDF...';
+            btn.disabled = true;
+
+            showPdfModal();
+
+            try {
+                // Get the report content
+                const reportElement = document.getElementById('reportContent');
+                
+                // Create a clone for PDF
+                const clone = reportElement.cloneNode(true);
+                
+                // Remove buttons and interactive elements
+                const noPrintElements = clone.querySelectorAll('.no-print');
+                noPrintElements.forEach(el => el.remove());
+                
+                // Create wrapper
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    padding: 40px;
+                    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+                    background: #ffffff;
+                    color: #1a1a1a;
+                    max-width: 800px;
+                    margin: 0 auto;
+                `;
+
+                // Add header
+                const headerDiv = document.createElement('div');
+                headerDiv.style.cssText = `
+                    text-align: center;
+                    padding: 20px 0 30px;
+                    border-bottom: 3px solid #1a2e3f;
+                    margin-bottom: 30px;
+                `;
+                headerDiv.innerHTML = `
+                    <h1 style="color:#1a2e3f; font-size:28px; margin:0; font-weight:800;">🏛️ AI Heritage</h1>
+                    <p style="color:#666; margin:5px 0 0; font-size:14px;">Preservation Report with Damage Analysis</p>
+                `;
+                wrapper.appendChild(headerDiv);
+
+                // Add content
+                wrapper.appendChild(clone);
+
+                // Add footer
+                const footerDiv = document.createElement('div');
+                footerDiv.style.cssText = `
+                    text-align: center;
+                    padding-top: 30px;
+                    margin-top: 30px;
+                    border-top: 1px solid #eee;
+                    color: #999;
+                    font-size: 12px;
+                `;
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                footerDiv.innerHTML = `
+                    <p>Generated by AI Heritage • ${dateStr}</p>
+                    <p style="margin-top:5px;">Preserving cultural heritage with artificial intelligence</p>
+                `;
+                wrapper.appendChild(footerDiv);
+
+                // Append to body temporarily
+                wrapper.id = 'pdfTempContainer';
+                document.body.appendChild(wrapper);
+
+                // Animate progress while html2canvas renders
+                await Promise.all([
+                    html2canvas(wrapper, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        width: 800,
+                        height: wrapper.scrollHeight
+                    }).then(canvas => {
+                        window.__pdfCanvas = canvas;
+                    }),
+                    new Promise(resolve => {
+                        animateProgressTo(70, 2500, resolve);
+                    })
+                ]);
+
+                const canvas = window.__pdfCanvas;
+                delete window.__pdfCanvas;
+
+                // Remove temp container
+                document.body.removeChild(wrapper);
+
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                let heightLeft = pdfHeight;
+                let position = 0;
+
+                // Add first page
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+
+                // Add additional pages if needed
+                while (heightLeft > 0) {
+                    position = heightLeft - pdfHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
+                }
+
+                // Finish progress
+                await new Promise(resolve => {
+                    animateProgressTo(100, 600, resolve);
+                });
+                pdfStatus.textContent = 'Report ready! Downloading...';
+
+                // Save PDF
+                pdf.save(`AI_Heritage_Report_${dateStr.replace(/,/g, '')}.pdf`);
+
+                // Success state + confetti
+                pdfModalCard.classList.add('success');
+                pdfModalCard.querySelector('.ring i').className = 'fas fa-check';
+                launchConfetti();
+
+                btn.innerHTML = '<i class="fas fa-check" style="color:#28a745;"></i> PDF Downloaded!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    hidePdfModal();
+                    btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download Full PDF Report';
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3500);
+
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                hidePdfModal();
+                alert('❌ Failed to generate PDF. Please try again.');
+                btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download Full PDF Report';
+                btn.disabled = false;
+            }
+        }
+
+        // ---------- INIT ----------
+        image.addEventListener('load', () => {
+            setupCanvas();
+            setTimeout(runAIAnalysis, 500);
+        });
+
+        if (image.complete) {
+            setupCanvas();
+            setTimeout(runAIAnalysis, 500);
+        }
+
+        const savedImage = localStorage.getItem('uploadedImage');
+        if (savedImage) {
+            image.src = savedImage;
+            localStorage.removeItem('uploadedImage');
+        }
+
+        console.log('✅ AI Heritage Report with full PDF download loaded!');
+        console.log('📄 Click "Download Full PDF Report" to save everything as PDF');
+    </script>
+</body>
+</html>

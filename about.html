@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+    <style>
+        .about-page {
+            min-height: 100vh;
+            padding: 8rem 1.5rem 4rem;
+            background: #0a0a0a;
+        }
+
+        .about-hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .about-hero h1 {
+            color: #fff;
+            font-size: 3.5rem;
+            font-weight: 900;
+        }
+
+        .about-hero p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 1rem auto 0;
+        }
+
+        .about-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .about-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .about-section:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .about-section h2 {
+            color: #d4af37;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .about-section p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .about-section ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+        }
+
+        .about-section ul li {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .about-section ul li::before {
+            content: '\2726';
+            color: #d4af37;
+            position: absolute;
+            left: 0;
+        }
+
+        .heritage-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .heritage-image-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .heritage-image-card:hover {
+            transform: translateY(-4px);
+            border-color: #d4af37;
+            box-shadow: 0 12px 28px rgba(212, 175, 55, 0.1);
+        }
+
+        .heritage-image-card .img-placeholder {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+        }
+
+        .heritage-image-card .img-info {
+            padding: 1rem 1.2rem;
+        }
+
+        .heritage-image-card .img-info h4 {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .heritage-image-card .img-info p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .heritage-images {
+                grid-template-columns: 1fr 1fr;
+            }
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+            .about-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .heritage-images {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+            if (!session || !session.token || !session.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+    </script>
+
+    <header id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="database.html">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="about-page">
+        <div class="about-content">
+            <div class="about-hero">
+                <h1>About <span class="gradient-text">AI Heritage</span></h1>
+                <p>Understanding the importance of cultural heritage preservation through AI technology</p>
+            </div>
+
+            <!-- Heritage Information from Wikipedia Style -->
+            <div class="about-section">
+                <h2><i class="fas fa-landmark"></i> What is Cultural Heritage?</h2>
+                <p>
+                    Cultural heritage is the legacy of physical artifacts and intangible attributes of a group or society 
+                    that are inherited from past generations, maintained in the present, and preserved for the benefit of 
+                    future generations. Cultural heritage includes tangible culture (such as buildings, monuments, 
+                    landscapes, books, works of art, and artifacts), intangible culture (such as folklore, traditions, 
+                    language, and knowledge), and natural heritage (including culturally significant landscapes, and 
+                    biodiversity).
+                </p>
+                <p style="margin-top: 1rem;">
+                    The protection and preservation of cultural heritage has become increasingly important in the face 
+                    of climate change, urbanization, conflict, and natural disasters. UNESCO (United Nations Educational, 
+                    Scientific and Cultural Organization) works to identify and protect cultural and natural heritage 
+                    around the world considered to be of outstanding value to humanity.
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h2><i class="fas fa-robot"></i> AI in Heritage Preservation</h2>
+                <p>
+                    Artificial intelligence is revolutionizing heritage preservation by providing advanced tools for 
+                    damage detection, documentation, and analysis. AI-powered systems can:
+                </p>
+                <ul>
+                    <li>Detect structural damage, cracks, and erosion in heritage monuments with high precision</li>
+                    <li>Monitor changes over time through automated image analysis</li>
+                    <li>Create 3D reconstructions and digital twins of heritage sites</li>
+                    <li>Predict potential damage risks based on environmental factors</li>
+                    <li>Assist in restoration planning with data-driven recommendations</li>
+                </ul>
+            </div>
+
+            <div class="about-section">
+                <h2><i class="fas fa-globe-asia"></i> Heritage Sites Around the World</h2>
+                <p>
+                    There are over 1,100 UNESCO World Heritage Sites across 167 countries. These include iconic 
+                    monuments, archaeological sites, cultural landscapes, and natural wonders that represent the 
+                    collective heritage of humanity.
+                </p>
+                
+                <div class="heritage-images">
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/Taj-Mahal-Agra.jpg.webp') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Taj Mahal</h4>
+                            <p>Agra, India &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/rome.jpeg') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Colosseum</h4>
+                            <p>Rome, Italy &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/Machu Picchu.jpg') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Machu Picchu</h4>
+                            <p>Peru &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/Angkor Wat.jpeg') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Angkor Wat</h4>
+                            <p>Cambodia &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/Alhambra.jpeg') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Alhambra</h4>
+                            <p>Spain &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                    <div class="heritage-image-card">
+                        <div class="img-placeholder" style="background: url('Images/Great Wall.jpeg') no-repeat center/cover;"></div>
+                        <div class="img-info">
+                            <h4>Great Wall of China</h4>
+                            <p>China &bull; UNESCO World Heritage Site</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <p>
+                    AI Heritage is committed to democratizing heritage preservation through accessible AI technology. 
+                    Our platform aims to:
+                </p>
+                <ul>
+                    <li>Provide free and easy-to-use AI tools for heritage damage detection</li>
+                    <li>Build a global database of heritage sites and their preservation status</li>
+                    <li>Empower local communities to monitor and protect their cultural heritage</li>
+                    <li>Support researchers and conservationists with data-driven insights</li>
+                    <li>Raise awareness about the importance of cultural heritage preservation</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.getElementById('hamburger').addEventListener('click', function() {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

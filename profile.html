@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+    <style>
+        .profile-page {
+            min-height: 100vh;
+            padding: 8rem 1.5rem 4rem;
+            background:
+                radial-gradient(800px 400px at 85% 0%, rgba(74, 124, 140, 0.1), transparent 60%),
+                radial-gradient(700px 350px at 10% 100%, rgba(212, 175, 55, 0.07), transparent 55%),
+                #fafaf8;
+        }
+
+        .profile-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            box-shadow: 0 2px 4px rgba(26, 46, 63, 0.05), 0 32px 64px -16px rgba(26, 46, 63, 0.25);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2e3f, #2c4a5f);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 2.5rem;
+            border: 3px solid #d4af37;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px rgba(26, 46, 63, 0.2);
+        }
+
+        .profile-card h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-card .email {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-item {
+            background: #f5f7f8;
+            padding: 1rem;
+            border-radius: 16px;
+        }
+
+        .meta-item .label {
+            color: #666;
+            font-size: 0.8rem;
+            display: block;
+        }
+
+        .meta-item .value {
+            font-weight: 700;
+            color: #1a2e3f;
+            font-size: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .guest-note {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-section {
+            background: #fff;
+            border-radius: 18px;
+            padding: 2rem;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            margin-top: 2rem;
+            text-align: left;
+            box-shadow: 0 1px 2px rgba(26, 46, 63, 0.04);
+        }
+
+        .activity-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(26, 46, 63, 0.07);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f5f7f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-item .details {
+            flex: 1;
+        }
+
+        .activity-item .details .action {
+            font-weight: 600;
+        }
+
+        .activity-item .details .time {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .activity-item .badge {
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.login { background: #e3f2fd; color: #1976d2; }
+        .badge.register { background: #e8f5e9; color: #388e3c; }
+        .badge.upload { background: #fff3e0; color: #f57c00; }
+        .badge.analyze { background: #f3e5f5; color: #7b1fa2; }
+        .badge.report { background: #fce4ec; color: #c62828; }
+        .badge.dashboard { background: #e8eaf6; color: #3949ab; }
+        .badge.database { background: #e0f2f1; color: #00796b; }
+        .badge.logout { background: #fce4ec; color: #c62828; }
+
+        @media (max-width: 480px) {
+            .profile-meta {
+                grid-template-columns: 1fr;
+            }
+            .profile-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="database.html">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="profile-page">
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-avatar">T</div>
+                <h1 id="profileName">Guest User</h1>
+                <div class="email" id="profileEmail">Not signed in</div>
+
+                <div class="profile-meta">
+                    <div class="meta-item">
+                        <span class="label">Member Since</span>
+                        <span class="value" id="profileJoined">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="label">Total Actions</span>
+                        <span class="value" id="profileActions">0</span>
+                    </div>
+                </div>
+
+                <div id="guestContent" style="display:none;">
+                    <p class="guest-note"><i class="fas fa-info-circle" style="color:#1a2e3f;"></i> You are browsing as a guest. Sign in to access your full profile.</p>
+                    <div class="profile-actions">
+                        <a href="login.html" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        <a href="register.html" class="btn-secondary"><i class="fas fa-user-plus"></i> Register</a>
+                    </div>
+                </div>
+
+                <div id="userContent" style="display:none;">
+                    <div class="profile-actions">
+                        <button onclick="logoutUser()" class="btn-secondary" style="font-family:'Inter',sans-serif; cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+
+                <div id="activityContent" style="display:none;">
+                    <div class="activity-section">
+                        <h2><i class="fas fa-history" style="color:#1a2e3f;"></i> Your Activity Log</h2>
+                        <div id="activityList">
+                            <p style="color:#999; text-align:center; padding:2rem 0;">No activity yet. Start by uploading an image!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const header = document.getElementById('header');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        window.addEventListener('scroll', () => {
+            if (header) {
+                if (window.scrollY > 50) header.classList.add('scrolled');
+                else header.classList.remove('scrolled');
+            }
+        });
+
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) navMenu.classList.remove('active');
+            });
+        });
+
+                        document.addEventListener('DOMContentLoaded', function() {
+            const session = getAiHeritageSession();
+
+            const guestContent = document.getElementById('guestContent');
+            const userContent = document.getElementById('userContent');
+            const activityContent = document.getElementById('activityContent');
+
+            function showGuest() {
+                guestContent.style.display = 'block';
+                userContent.style.display = 'none';
+                activityContent.style.display = 'none';
+            }
+
+            if (!session || !session.token || !session.user) {
+                showGuest();
+                return;
+            }
+
+                fetch(apiUrl('/api/me'), { headers: { 'Authorization': 'Bearer ' + session.token } })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) throw new Error('invalid');
+                const user = data.user;
+                document.getElementById('profileName').textContent = user.name;
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('profileJoined').textContent = user.joined ? new Date(user.joined).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+                loadActivity(session.token, user.email);
+                guestContent.style.display = 'none';
+                userContent.style.display = 'block';
+                activityContent.style.display = 'block';
+            })
+            .catch(() => showGuest());
+        });
+
+        function loadActivity(token, email) {
+                fetch(apiUrl('/api/activity'), { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                const userLogs = (data.success ? data.activities : []);
+                const activityList = document.getElementById('activityList');
+                document.getElementById('profileActions').textContent = userLogs.length;
+
+                if (userLogs.length === 0) {
+                    activityList.innerHTML = `<p style="color:#999; text-align:center; padding:2rem 0;">
+                        <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:1rem;"></i>
+                        No activity yet. Start by uploading an image!
+                    </p>`;
+                    return;
+                }
+
+                const icons = {
+                    login: 'fa-sign-in-alt',
+                    register: 'fa-user-plus',
+                    upload: 'fa-upload',
+                    analyze: 'fa-robot',
+                    report: 'fa-file-pdf',
+                    database: 'fa-database',
+                    dashboard: 'fa-home',
+                    logout: 'fa-sign-out-alt'
+                };
+
+                let html = '';
+                userLogs.forEach(log => {
+                    const time = new Date(log.timestamp);
+                    const timeStr = time.toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    const icon = icons[log.action] || 'fa-circle';
+                    html += `<div class="activity-item">
+                        <div class="icon"><i class="fas ${icon}"></i></div>
+                        <div class="details">
+                            <div class="action">${log.details}</div>
+                            <div class="time">${timeStr}</div>
+                        </div>
+                        <span class="badge ${log.action}">${log.action}</span>
+                    </div>`;
+                });
+                activityList.innerHTML = html;
+            })
+            .catch(() => {});
+        }
+
+        function logoutUser() {
+            const session = getAiHeritageSession();
+            if (session && session.token) {
+                fetch(apiUrl('/api/logout'), { method: 'POST', headers: { 'Authorization': 'Bearer ' + session.token } }).catch(() => {});
+            }
+            localStorage.removeItem('aiHeritageSession');
+            sessionStorage.removeItem('aiHeritageSession');
+            window.location.href = 'login.html';
+        }
+
+        console.log('\u2705 Profile page loaded');
+    </script>
+</body>
+</html>

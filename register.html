@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 1.5rem 3rem;
+            background:
+                radial-gradient(800px 400px at 85% 10%, rgba(74, 124, 140, 0.12), transparent 60%),
+                radial-gradient(700px 400px at 10% 90%, rgba(212, 175, 55, 0.08), transparent 55%),
+                linear-gradient(135deg, #fafaf8 0%, #eef2f4 100%);
+        }
+
+        .auth-container {
+            background: #fff;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(26, 46, 63, 0.05), 0 32px 64px -16px rgba(26, 46, 63, 0.25);
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-header .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a2e3f;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e8edf0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a2e3f;
+        }
+
+        .form-group .input-icon {
+            position: relative;
+        }
+
+        .form-group .input-icon i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .form-group .input-icon input {
+            padding-left: 40px;
+        }
+
+        .form-options {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .form-options input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1a2e3f;
+        }
+
+        .form-options a {
+            color: #1a2e3f;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-options a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.9rem;
+            background: #1a2e3f;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-auth:hover {
+            background: #2c4a5f;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(26, 46, 63, 0.2);
+        }
+
+        .btn-auth:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .auth-footer a {
+            color: #1a2e3f;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-home:hover {
+            color: #1a2e3f;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e8edf0;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .password-strength .bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .password-strength .bar.weak {
+            width: 33%;
+            background: #ff6b6b;
+        }
+
+        .password-strength .bar.medium {
+            width: 66%;
+            background: #ffd93d;
+        }
+
+        .password-strength .bar.strong {
+            width: 100%;
+            background: #6bcf7f;
+        }
+
+        .password-hint {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .alert.error {
+            display: block;
+            background: #fee;
+            color: #dc3545;
+            border: 1px solid #fcc;
+        }
+
+        .alert.success {
+            display: block;
+            background: #efe;
+            color: #28a745;
+            border: 1px solid #cfc;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 2rem 1.5rem;
+            }
+            .auth-header h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="profile.html" title="Profile" style="position:fixed; top:1.5rem; right:1.5rem; z-index:1000; width:36px; height:36px; border-radius:50%; background:#1a2e3f; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem; text-decoration:none;">T</a>
+
+    <section class="auth-page">
+        <div class="auth-container">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+
+            <div class="auth-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                    <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+                </a>
+                <h2>Create Account</h2>
+                <p>Join us in preserving our cultural heritage</p>
+            </div>
+
+            <div id="alertMessage" class="alert"></div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="fullname" placeholder="John Doe" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="you@example.com" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Create a strong password" required oninput="checkPasswordStrength(this.value)" />
+                    </div>
+                    <div class="password-strength">
+                        <div class="bar" id="passwordBar"></div>
+                    </div>
+                    <div class="password-hint">Minimum 6 characters with letters and numbers</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-check-circle"></i>
+                        <input type="password" id="confirmPassword" placeholder="Confirm your password" required />
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <input type="checkbox" id="terms" required />
+                    <label for="terms">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth" id="registerBtn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="login.html">Login here</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function checkPasswordStrength(password) {
+            const bar = document.getElementById('passwordBar');
+            let strength = 0;
+
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            bar.className = 'bar';
+            if (strength <= 1) {
+                bar.classList.add('weak');
+            } else if (strength <= 3) {
+                bar.classList.add('medium');
+            } else if (strength >= 4) {
+                bar.classList.add('strong');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            const alertEl = document.getElementById('alertMessage');
+            const registerBtn = document.getElementById('registerBtn');
+
+            if (!fullname || !email || !password || !confirm) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Please fill in all fields';
+                return;
+            }
+
+            if (fullname.length < 2) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Please enter your full name';
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Please enter a valid email address';
+                return;
+            }
+
+            if (password.length < 6) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Password must be at least 6 characters';
+                return;
+            }
+
+            if (password !== confirm) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Passwords do not match';
+                return;
+            }
+
+            if (!terms) {
+                alertEl.className = 'alert error';
+                alertEl.textContent = '\u26A0\uFE0F Please agree to the Terms of Service';
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+
+            fetch(apiUrl('/api/register'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: fullname, email: email, password: password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alertEl.className = 'alert success';
+                    alertEl.textContent = 'Registration successful! Redirecting to login...';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                } else {
+                    alertEl.className = 'alert error';
+                    alertEl.textContent = data.error || 'Registration failed. Please try again.';
+                    registerBtn.disabled = false;
+                    registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+                }
+            })
+            .catch(() => {
+                alertEl.className = 'alert error';
+                alertEl.textContent = 'Cannot connect to the API at ' + apiUrl('/api/register') + '. Run "npm start" in the project folder.';
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            });
+        }
+        console.log('\u2705 Register page loaded');
+    </script>
+</body>
+</html>

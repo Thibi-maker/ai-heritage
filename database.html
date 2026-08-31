@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heritage Database - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+            if (!session || !session.token || !session.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+    </script>
+
+    <header id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="database.html" class="active">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="database-page">
+        <div class="database-header">
+            <div class="database-kicker"><span class="database-status-dot"></span> LIVE HERITAGE ARCHIVE <span id="databaseSyncStatus">SYNCING</span></div>
+            <h1>Read the <span class="gradient-text">story</span><br />behind every stone.</h1>
+            <p>Historical surveys, preservation data, and prevention strategies for heritage sites</p>
+            <div class="database-actions">
+                <button class="database-action database-action-primary" id="refreshDatabase" type="button">
+                    <i class="fas fa-rotate"></i><span>Refresh Live Data</span>
+                </button>
+                <a class="database-action database-action-ghost" href="#records-card">
+                    <span>Explore records</span><i class="fas fa-arrow-down"></i>
+                </a>
+            </div>
+            <div class="database-orbit database-orbit-one"></div>
+            <div class="database-orbit database-orbit-two"></div>
+        </div>
+
+        <div class="database-grid">
+            <div class="database-card database-card-featured">
+                <div class="card-icon">📋</div>
+                <h3>Historical Surveys</h3>
+                <p>Comprehensive survey data from heritage sites across the globe</p>
+                <div class="survey-data">
+                    <div class="stat-row">
+                        <span class="stat-label">Total Sites Surveyed</span>
+                        <span class="stat-value" id="statTotalSites">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Countries Represented</span>
+                        <span class="stat-value" id="statCountries">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">UNESCO Sites</span>
+                        <span class="stat-value" id="statUnesco">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">At Risk Sites</span>
+                        <span class="stat-value" id="statAtRisk">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Preservation Projects</span>
+                        <span class="stat-value" id="statProjects">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="database-card database-card-strategies">
+                <div class="card-icon">🛡️</div>
+                <h3>Prevention Strategies</h3>
+                <p>AI-recommended preservation methods for different types of heritage sites</p>
+                <div id="strategiesList"></div>
+            </div>
+
+            <div class="database-card database-card-records" id="records-card">
+                <div class="card-icon">📜</div>
+                <h3>Historical Records</h3>
+                <p>Documented history and preservation efforts of major heritage sites</p>
+                <div class="survey-data" id="recordsList"></div>
+            </div>
+
+            <div class="database-card database-card-methods">
+                <div class="card-icon">🔧</div>
+                <h3>Prevention Methods</h3>
+                <p>Modern techniques for heritage preservation and damage prevention</p>
+                <ul style="color:#555; padding-left:1.2rem; line-height:2.2;" id="methodsList"></ul>
+            </div>
+
+            <div class="database-card database-card-projects">
+                <div class="card-icon">🌍</div>
+                <h3>Conservation Projects</h3>
+                <p>Ongoing heritage preservation initiatives worldwide</p>
+                <div class="survey-data">
+                    <div class="stat-row">
+                        <span class="stat-label">Active Projects</span>
+                        <span class="stat-value" id="statActive">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Completed Projects</span>
+                        <span class="stat-value" id="statCompleted">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">In Progress</span>
+                        <span class="stat-value" id="statInProgress">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Planned Initiatives</span>
+                        <span class="stat-value" id="statPlanned">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="database-card database-card-stats">
+                <div class="card-icon">📊</div>
+                <h3>Heritage Statistics</h3>
+                <p>Global heritage preservation statistics and trends</p>
+                <div class="survey-data">
+                    <div class="stat-row">
+                        <span class="stat-label">UNESCO World Heritage</span>
+                        <span class="stat-value" id="statWorldHeritage">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Cultural Sites</span>
+                        <span class="stat-value" id="statCultural">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Natural Sites</span>
+                        <span class="stat-value" id="statNatural">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Mixed Sites</span>
+                        <span class="stat-value" id="statMixed">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Endangered Sites</span>
+                        <span class="stat-value" id="statEndangered">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+            const refreshButton = document.getElementById('refreshDatabase');
+            const syncStatus = document.getElementById('databaseSyncStatus');
+
+            if (!session || !session.token) return;
+
+            const escapeHtml = value => String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+            const set = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val !== undefined && val !== null ? val.toLocaleString() : '-';
+            };
+
+            function loadDatabase() {
+                refreshButton?.classList.add('is-loading');
+                if (refreshButton) refreshButton.disabled = true;
+                if (syncStatus) syncStatus.textContent = 'SYNCING';
+
+                fetch(apiUrl('/api/database'), { headers: { 'Authorization': 'Bearer ' + session.token } })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) throw new Error('Database request failed');
+                    const s = data.stats;
+
+                    set('statTotalSites', s.totalSites);
+                    set('statCountries', s.countries);
+                    set('statUnesco', s.unescoSites);
+                    set('statAtRisk', s.atRiskSites);
+                    set('statProjects', s.preservationProjects);
+                    set('statActive', s.conservation.active);
+                    set('statCompleted', s.conservation.completed);
+                    set('statInProgress', s.conservation.inProgress);
+                    set('statPlanned', s.conservation.planned);
+                    set('statWorldHeritage', s.heritage.worldHeritage);
+                    set('statCultural', s.heritage.cultural);
+                    set('statNatural', s.heritage.natural);
+                    set('statMixed', s.heritage.mixed);
+                    set('statEndangered', s.heritage.endangered);
+
+                    const strategiesEl = document.getElementById('strategiesList');
+                    if (strategiesEl) {
+                        strategiesEl.innerHTML = data.strategies.map(str =>
+                            `<div class="prevention-tip">
+                                <strong>${escapeHtml(str.icon)} ${escapeHtml(str.title)}</strong>
+                                <p>${escapeHtml(str.advice)}</p>
+                            </div>`
+                        ).join('');
+                    }
+
+                    const recordsEl = document.getElementById('recordsList');
+                    if (recordsEl) {
+                        recordsEl.innerHTML = data.records.map(r =>
+                            `<div class="stat-row">
+                                <span class="stat-label">${escapeHtml(r.name)}</span>
+                                <span class="stat-value" style="font-size:0.85rem;">Built ${escapeHtml(r.year_built || 'N/A')} • ${escapeHtml(r.status || 'Unknown')}</span>
+                            </div>`
+                        ).join('');
+                    }
+
+                    const methodsEl = document.getElementById('methodsList');
+                    if (methodsEl) {
+                        methodsEl.innerHTML = data.methods.map(m => `<li>✅ ${escapeHtml(m.method)}</li>`).join('');
+                    }
+
+                    document.querySelectorAll('.database-card').forEach((card, index) => {
+                        card.style.setProperty('--card-index', index);
+                        card.classList.add('is-loaded');
+                    });
+                    if (syncStatus) syncStatus.textContent = `LIVE • ${data.records.length} RECORDS`;
+                })
+                .catch(() => {
+                    if (syncStatus) syncStatus.textContent = 'OFFLINE';
+                    document.querySelectorAll('.database-card .stat-value').forEach(el => el.textContent = '-');
+                })
+                .finally(() => {
+                    refreshButton?.classList.remove('is-loading');
+                    if (refreshButton) refreshButton.disabled = false;
+                });
+            }
+
+            refreshButton?.addEventListener('click', loadDatabase);
+            loadDatabase();
+        });
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

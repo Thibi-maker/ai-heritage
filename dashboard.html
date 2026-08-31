@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+    <style>
+        .dashboard-page {
+            min-height: 100vh;
+            padding: 8rem 1.5rem 4rem;
+            background: #fafaf8;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fff;
+            padding: 0.5rem 1.5rem 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+        }
+
+        .dashboard-header .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a2e3f;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .dashboard-header .user-info .name {
+            font-weight: 600;
+        }
+
+        .dashboard-header .user-info .email {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 1.5rem;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(26, 46, 63, 0.04);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 2px 4px rgba(26, 46, 63, 0.05), 0 18px 40px -12px rgba(26, 46, 63, 0.22);
+            border-color: rgba(74, 124, 140, 0.3);
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a2e3f;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9rem;
+            display: block;
+            margin-top: 0.2rem;
+        }
+
+        .stat-card .icon {
+            font-size: 1.5rem;
+            opacity: 0.3;
+            float: right;
+        }
+
+        .activity-section {
+            background: #fff;
+            border-radius: 18px;
+            padding: 2rem;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 2px rgba(26, 46, 63, 0.04);
+        }
+
+        .activity-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(26, 46, 63, 0.07);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f5f7f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-item .details {
+            flex: 1;
+        }
+
+        .activity-item .details .action {
+            font-weight: 600;
+        }
+
+        .activity-item .details .time {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .activity-item .badge {
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.login { background: #e3f2fd; color: #1976d2; }
+        .badge.register { background: #e8f5e9; color: #388e3c; }
+        .badge.upload { background: #fff3e0; color: #f57c00; }
+        .badge.analyze { background: #f3e5f5; color: #7b1fa2; }
+        .badge.report { background: #fce4ec; color: #c62828; }
+        .badge.dashboard { background: #e8eaf6; color: #3949ab; }
+        .badge.logout { background: #fce4ec; color: #c62828; }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .quick-action {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(26, 46, 63, 0.07);
+            text-decoration: none;
+            color: #1a1a1a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(26, 46, 63, 0.04);
+        }
+
+        .quick-action:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 2px 4px rgba(26, 46, 63, 0.05), 0 18px 40px -12px rgba(26, 46, 63, 0.22);
+            border-color: rgba(74, 124, 140, 0.35);
+        }
+
+        .quick-action .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action .label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .quick-action .desc {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .dashboard-header h1 {
+                font-size: 1.8rem;
+            }
+            .dashboard-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header" class="no-print">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="database.html">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="dashboard-page">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Welcome, <span class="gradient-text" id="userNameDisplay">User</span>!</h1>
+                    <p style="color:#666; margin-top:0.2rem;">Your AI Heritage preservation dashboard</p>
+                </div>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <div>
+                        <div class="name" id="userDisplayName">User</div>
+                        <div class="email" id="userDisplayEmail">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-stats" id="statsContainer">
+                <div class="stat-card">
+                    <span class="icon">&#x1F4CA;</span>
+                    <span class="number" id="totalActions">0</span>
+                    <span class="label">Total Actions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="icon">&#x1F4E4;</span>
+                    <span class="number" id="totalUploads">0</span>
+                    <span class="label">Images Uploaded</span>
+                </div>
+                <div class="stat-card">
+                    <span class="icon">&#x1F50D;</span>
+                    <span class="number" id="totalAnalyses">0</span>
+                    <span class="label">Analyses Performed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="icon">&#x1F4C4;</span>
+                    <span class="number" id="totalReports">0</span>
+                    <span class="label">Reports Generated</span>
+                </div>
+            </div>
+
+            <div class="activity-section">
+                <h2><i class="fas fa-history" style="color:#1a2e3f;"></i> Your Activity Log</h2>
+                <div id="activityList">
+                    <p style="color:#999; text-align:center; padding:2rem 0;">No activity yet. Start by uploading an image!</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <a href="upload.html" class="quick-action" onclick="logAction('upload', 'Clicked Upload Image')">
+                    <div class="icon">&#x1F4F7;</div>
+                    <div class="label">Upload Image</div>
+                    <div class="desc">Analyze a new monument</div>
+                </a>
+                <a href="analysis.html" class="quick-action" onclick="logAction('analyze', 'Clicked View Analysis')">
+                    <div class="icon">&#x1F4CA;</div>
+                    <div class="label">View Analysis</div>
+                    <div class="desc">See detection results</div>
+                </a>
+                <a href="report.html" class="quick-action" onclick="logAction('report', 'Clicked Generate Report')">
+                    <div class="icon">&#x1F4C4;</div>
+                    <div class="label">Generate Report</div>
+                    <div class="desc">Create preservation report</div>
+                </a>
+                <a href="database.html" class="quick-action" onclick="logAction('database', 'Clicked Browse Database')">
+                    <div class="icon">&#x1F3DB;&#xFE0F;</div>
+                    <div class="label">Browse Database</div>
+                    <div class="desc">Explore heritage data</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+                // ---------- CHECK SESSION ----------
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+
+            if (!session || !session.token || !session.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = session.user;
+
+            document.getElementById('userNameDisplay').textContent = user.name;
+            document.getElementById('userDisplayName').textContent = user.name;
+            document.getElementById('userDisplayEmail').textContent = user.email;
+            document.getElementById('userAvatar').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+
+            loadUserActivity(session.token);
+            loadUserStats(session.token);
+
+            logAction('dashboard', 'Viewed dashboard');
+        });
+
+        // ---------- LOAD USER ACTIVITY ----------
+        function loadUserActivity(token) {
+            fetch(apiUrl('/api/activity'), { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                const userLogs = (data.success ? data.activities : []).slice().reverse();
+                renderActivityList(userLogs);
+                return userLogs;
+            })
+            .catch(() => renderActivityList([]));
+        }
+
+        function renderActivityList(userLogs) {
+            const activityList = document.getElementById('activityList');
+
+            if (userLogs.length === 0) {
+                activityList.innerHTML = `<p style="color:#999; text-align:center; padding:2rem 0;">
+                    <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:1rem;"></i>
+                    No activity yet. Start by uploading an image!
+                </p>`;
+                return;
+            }
+
+            const icons = {
+                login: 'fa-sign-in-alt',
+                register: 'fa-user-plus',
+                upload: 'fa-upload',
+                analyze: 'fa-robot',
+                report: 'fa-file-pdf',
+                database: 'fa-database',
+                dashboard: 'fa-home',
+                logout: 'fa-sign-out-alt'
+            };
+
+            let html = '';
+            userLogs.forEach(log => {
+                const time = new Date(log.timestamp);
+                const timeStr = time.toLocaleString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                const icon = icons[log.action] || 'fa-circle';
+                html += `<div class="activity-item">
+                    <div class="icon"><i class="fas ${icon}"></i></div>
+                    <div class="details">
+                        <div class="action">${log.details}</div>
+                        <div class="time">${timeStr}</div>
+                    </div>
+                    <span class="badge ${log.action}">${log.action}</span>
+                </div>`;
+            });
+
+            activityList.innerHTML = html;
+        }
+
+        // ---------- LOAD USER STATS ----------
+        function loadUserStats(token) {
+            fetch(apiUrl('/api/activity'), { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                const logs = data.success ? data.activities : [];
+                const total = logs.length;
+                const uploads = logs.filter(l => l.action === 'upload').length;
+                const analyses = logs.filter(l => l.action === 'analyze').length;
+                const reports = logs.filter(l => l.action === 'report').length;
+
+                document.getElementById('totalActions').textContent = total;
+                document.getElementById('totalUploads').textContent = uploads;
+                document.getElementById('totalAnalyses').textContent = analyses;
+                document.getElementById('totalReports').textContent = reports;
+            })
+            .catch(() => {});
+        }
+
+        // ---------- LOG USER ACTION ----------
+        function logAction(action, details) {
+            const session = getAiHeritageSession();
+            if (!session || !session.token) return;
+            fetch(apiUrl('/api/log'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.token },
+                body: JSON.stringify({ action: action, details: details })
+            })
+            .then(() => {
+                loadUserActivity(session.token);
+                loadUserStats(session.token);
+            })
+            .catch(() => {});
+        }
+
+        // ---------- LOGOUT ----------
+        function logout() {
+            const session = getAiHeritageSession();
+
+            if (session && session.token) {
+                fetch(apiUrl('/api/logout'), { method: 'POST', headers: { 'Authorization': 'Bearer ' + session.token } })
+                .catch(() => {});
+            }
+
+            localStorage.removeItem('aiHeritageSession');
+            sessionStorage.removeItem('aiHeritageSession');
+            
+            window.location.href = 'login.html';
+        }
+
+        // ---------- NAVIGATION ----------
+        const header = document.getElementById('header');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) navMenu.classList.remove('active');
+            });
+        });
+
+        console.log('\u2705 Dashboard loaded with user session');
+    </script>
+</body>
+</html>

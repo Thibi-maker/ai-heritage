@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Image - AI Heritage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+</head>
+<body>
+
+    <header id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="upload.html" class="active">Upload</a></li>
+                <li><a href="database.html">Database</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="upload-page">
+        <div class="upload-container">
+            <div class="upload-header">
+                <div class="upload-kicker"><span class="upload-kicker-dot"></span> AI VISION WORKSPACE <span>STEP 01 / 03</span></div>
+                <h1>Turn a monument into <span class="gradient-text">insight.</span></h1>
+                <p>Upload images of heritage monuments for AI damage detection and analysis</p>
+                <div class="upload-trust-row">
+                    <span><i class="fas fa-wand-magic-sparkles"></i> AI-assisted analysis</span>
+                    <span><i class="fas fa-shield-halved"></i> Private by design</span>
+                    <span><i class="fas fa-bolt"></i> Results in seconds</span>
+                </div>
+            </div>
+
+            <div class="upload-box" id="uploadBox" role="button" tabindex="0" aria-label="Choose a heritage image to upload">
+                <div class="upload-box-topline"><span>DROP ZONE</span><span>JPG · PNG · WEBP</span></div>
+                <div class="icon">📷</div>
+                <h3>Drop your image here</h3>
+                <p>or click to browse files (JPG, PNG, WEBP)</p>
+                <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" />
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-grid">
+                    <div class="preview-image">
+                        <span class="preview-badge"><i class="fas fa-circle-check"></i> READY</span>
+                        <img id="previewImage" src="#" alt="Preview" />
+                    </div>
+                    <div class="preview-info">
+                        <h4>Image Ready for Analysis</h4>
+                        <div class="file-details">
+                            <span>File Name</span>
+                            <strong id="fileName">-</strong>
+                            <span>File Size</span>
+                            <strong id="fileSize">-</strong>
+                            <span>Dimensions</span>
+                            <strong id="fileDimensions">-</strong>
+                        </div>
+                        <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()">
+                            <i class="fas fa-robot"></i> Analyze Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-status">
+                    <span class="spinner">⚙️</span> Processing your image...
+                </div>
+                <div class="progress-bar">
+                    <div class="fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressText" style="margin-top:0.5rem; font-size:0.85rem; color:#666;">
+                    Initializing AI models...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ---------- CHECK SESSION ----------
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const savedImage = localStorage.getItem('uploadedImage');
+            if (savedImage) {
+                document.getElementById('previewImage').src = savedImage;
+                document.getElementById('previewContainer').classList.add('active');
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        });
+
+        // ---------- NAVIGATION ----------
+        const header = document.getElementById('header');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) navMenu.classList.remove('active');
+            });
+        });
+
+        // ---------- LOG USER ACTION ----------
+        function logUserAction(email, action, details) {
+            const logs = JSON.parse(localStorage.getItem('aiHeritageLogs')) || [];
+            logs.push({
+                user: email,
+                action: action,
+                details: details,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('aiHeritageLogs', JSON.stringify(logs));
+        }
+
+        // ---------- UPLOAD ----------
+        const uploadBox = document.getElementById('uploadBox');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileDimensions = document.getElementById('fileDimensions');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.classList.add('dragover');
+        });
+
+        uploadBox.addEventListener('click', (e) => {
+            if (!e.target.closest('.browse-btn')) fileInput.click();
+        });
+
+        uploadBox.addEventListener('keydown', (e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.browse-btn')) {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.classList.remove('dragover');
+        });
+
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect(e);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0] || fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                
+                fileName.textContent = file.name;
+                const sizeKB = (file.size / 1024).toFixed(1);
+                fileSize.textContent = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+                
+                const img = new Image();
+                img.onload = function() {
+                    fileDimensions.textContent = img.width + ' x ' + img.height + ' px';
+                    localStorage.setItem('uploadedImage', e.target.result);
+                    
+                    const session = getAiHeritageSession();
+                    if (session) {
+                        logUserAction(session.user.email, 'upload', `Uploaded image: ${file.name} (${img.width}x${img.height})`);
+                    }
+                };
+                img.src = e.target.result;
+                
+                previewContainer.classList.add('active');
+                analyzeBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function analyzeImage() {
+            analyzeBtn.disabled = true;
+            progressContainer.classList.add('active');
+            
+            const statuses = [
+                'Loading AI model...',
+                'Scanning for damage patterns...',
+                'Analyzing structural integrity...',
+                'Detecting cracks and erosion...',
+                'Generating comprehensive report...'
+            ];
+            
+            let progress = 0;
+            let statusIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 8 + 2;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = progress + '%';
+                
+                if (statusIndex < statuses.length) {
+                    progressText.textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = '✅ Analysis complete! Redirecting to report...';
+                    
+                    const session = getAiHeritageSession();
+                    if (session) {
+                        logUserAction(session.user.email, 'analyze', 'Performed AI analysis on uploaded image');
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = 'report.html';
+                    }, 1500);
+                }
+            }, 400);
+        }
+
+        console.log('✅ Upload page loaded with session');
+    </script>
+</body>
+</html>

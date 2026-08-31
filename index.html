@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Heritage - Preserving Legacy with AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app-config.js"></script>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getAiHeritageSession();
+            if (!session || !session.token || !session.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+    </script>
+
+    <header id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark"><i class="fas fa-landmark"></i></span>
+                <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#hero" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="database.html">Database</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="profile.html" title="Profile" class="user-avatar">T</a>
+            </div>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <h1>
+                        Preserving<br />
+                        <span class="gradient-text">Heritage</span><br />
+                        with AI
+                    </h1>
+                    <p>
+                        Leveraging artificial intelligence to protect, preserve, and restore
+                        our cultural heritage monuments for future generations.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="upload.html" class="btn-primary">
+                            <i class="fas fa-rocket"></i> Get Started
+                        </a>
+                        <a href="upload.html" class="btn-secondary">
+                            <i class="fas fa-upload"></i> Upload Image
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-image-container" style="background: url('Images/11.webp') no-repeat center/cover;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-preview" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <h2>About <span class="gradient-text">AI Heritage</span></h2>
+                    <p>
+                        AI Heritage is a cutting-edge platform that uses artificial intelligence
+                        and computer vision to detect damage, assess preservation needs, and
+                        monitor the condition of heritage monuments worldwide.
+                    </p>
+                    <p>
+                        Our mission is to make heritage preservation accessible, data-driven,
+                        and efficient through the power of AI technology.
+                    </p>
+                    <a href="about.html" class="btn-primary">Learn More <i class="fas fa-arrow-right"></i></a>
+
+                    <div class="about-stats-mini">
+                        <div class="stat-mini">
+                            <div class="number">150+</div>
+                            <div class="label">Monuments</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="number">5K+</div>
+                            <div class="label">Images Processed</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="number">98%</div>
+                            <div class="label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div>
+                        <i class="fas fa-robot icon"></i>
+                        <p class="caption">AI-Powered Heritage Conservation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Key <span class="gradient-text">Features</span></h2>
+            <p class="section-subtitle">Powered by advanced AI technology to protect our heritage</p>
+
+            <div class="features-grid">
+                <div class="feature-card" onclick="window.location.href='upload.html'">
+                    <div class="feature-icon">🧠</div>
+                    <h3>AI Damage Detection</h3>
+                    <p>Advanced algorithms detect cracks, erosion, and structural damage with high precision.</p>
+                </div>
+                <div class="feature-card" onclick="window.location.href='upload.html'">
+                    <div class="feature-icon">📷</div>
+                    <h3>Image Upload</h3>
+                    <p>Easily upload monument images for instant AI analysis and damage assessment.</p>
+                </div>
+                <div class="feature-card" onclick="window.location.href='analysis.html'">
+                    <div class="feature-icon">📊</div>
+                    <h3>Damage Analysis</h3>
+                    <p>Comprehensive analysis reports with severity levels and confidence scores.</p>
+                </div>
+                <div class="feature-card" onclick="window.location.href='report.html'">
+                    <div class="feature-icon">📄</div>
+                    <h3>Report Generation</h3>
+                    <p>Generate detailed PDF reports for preservation planning and documentation.</p>
+                </div>
+                <div class="feature-card" onclick="window.location.href='database.html'">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>Heritage Database</h3>
+                    <p>Comprehensive database of monitored monuments with historical records.</p>
+                </div>
+                <div class="feature-card" onclick="window.location.href='security.html'">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Data Storage</h3>
+                    <p>Enterprise-grade security for all your heritage preservation data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+            <p class="section-subtitle">Simple 5-step process to analyze and preserve heritage monuments</p>
+
+            <div class="steps">
+                <div class="step" onclick="window.location.href='upload.html'">
+                    <span class="step-number">1</span>
+                    <span class="step-icon">📤</span>
+                    <h4>Upload Image</h4>
+                    <p>Upload high-resolution images of the monument</p>
+                </div>
+                <div class="step" onclick="window.location.href='analysis.html'">
+                    <span class="step-number">2</span>
+                    <span class="step-icon">🤖</span>
+                    <h4>AI Processing</h4>
+                    <p>Our AI models analyze the image in real-time</p>
+                </div>
+                <div class="step" onclick="window.location.href='analysis.html'">
+                    <span class="step-number">3</span>
+                    <span class="step-icon">🔍</span>
+                    <h4>Damage Detection</h4>
+                    <p>Identify cracks, erosion, and structural issues</p>
+                </div>
+                <div class="step" onclick="window.location.href='dashboard.html'">
+                    <span class="step-number">4</span>
+                    <span class="step-icon">📊</span>
+                    <h4>View Results</h4>
+                    <p>Get detailed analysis with severity levels</p>
+                </div>
+                <div class="step" onclick="window.location.href='report.html'">
+                    <span class="step-number">5</span>
+                    <span class="step-icon">📥</span>
+                    <h4>Download Report</h4>
+                    <p>Export comprehensive PDF preservation reports</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="statistics">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="number">150+</span>
+                    <span class="label">Monuments Monitored</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">5,432</span>
+                    <span class="label">Images Processed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">1,287</span>
+                    <span class="label">Damage Cases Detected</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">2,156</span>
+                    <span class="label">Reports Generated</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <h2 class="section-title">Heritage <span class="gradient-text">Gallery</span></h2>
+            <p class="section-subtitle">Iconic monuments preserved through AI technology</p>
+
+            <div class="gallery-grid">
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/Taj-Mahal-Agra.jpg.webp') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Taj Mahal</h4>
+                        <p>Agra, India • Preserved</p>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/rome.jpeg') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Colosseum</h4>
+                        <p>Rome, Italy • Under Restoration</p>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/Machu Picchu.jpg') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Machu Picchu</h4>
+                        <p>Peru • Monitored</p>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/Angkor Wat.jpeg') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Angkor Wat</h4>
+                        <p>Cambodia • Preserved</p>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/Alhambra.jpeg') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Alhambra</h4>
+                        <p>Spain • Under Restoration</p>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-image" style="background: url('Images/Great Wall.jpeg') no-repeat center/cover;"></div>
+                    <div class="gallery-info">
+                        <h4>Great Wall</h4>
+                        <p>China • Monitored</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What People <span class="gradient-text">Say</span></h2>
+            <p class="section-subtitle">Real feedback from heritage preservation professionals</p>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="quote">"AI Heritage has revolutionized how we monitor and preserve our cultural monuments. The accuracy of damage detection is remarkable."</p>
+                    <div class="author-row">
+                        <div class="author-avatar">S</div>
+                        <div>
+                            <div class="author">Dr. Sarah Johnson</div>
+                            <div class="role">UNESCO Heritage Expert</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">"This platform has made heritage preservation accessible to communities worldwide. The AI analysis is incredibly detailed and reliable."</p>
+                    <div class="author-row">
+                        <div class="author-avatar">R</div>
+                        <div>
+                            <div class="author">Prof. Rajesh Kumar</div>
+                            <div class="role">Archaeologist, ASI</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">"The report generation feature has streamlined our documentation process significantly. A game-changer for heritage management."</p>
+                    <div class="author-row">
+                        <div class="author-avatar">M</div>
+                        <div>
+                            <div class="author">Maria Garcia</div>
+                            <div class="role">Heritage Site Manager</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Protect Our Heritage with AI</h2>
+            <p>Join us in preserving cultural monuments for future generations using cutting-edge AI technology.</p>
+            <a href="register.html" class="btn-primary">
+                <i class="fas fa-robot"></i> Get Started Now
+            </a>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>🏛️ AI Heritage</h3>
+                    <p>Preserving cultural heritage through artificial intelligence and computer vision technology.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html#hero">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="database.html">Database</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-envelope"></i> info@aiheritage.org</a></li>
+                        <li><a href="#"><i class="fas fa-phone"></i> +1 (555) 123-4567</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> New Delhi, India</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AI Heritage. All rights reserved. Preserving our cultural legacy with AI.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ---------- NAVIGATION ----------
+        const header = document.getElementById('header');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) navMenu.classList.remove('active');
+            });
+        });
+
+        // ---------- SCROLL REVEAL ----------
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                    entry.target.style.opacity = '1';
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .step, .stat-item, .gallery-card, .testimonial-card').forEach(el => {
+            el.style.opacity = '0';
+            revealObserver.observe(el);
+        });
+
+        // ---------- COUNTER ANIMATION ----------
+        const statsSection = document.querySelector('.statistics');
+        let statsAnimated = false;
+
+        function animateCounters() {
+            document.querySelectorAll('.stat-item .number').forEach(stat => {
+                const text = stat.textContent;
+                const num = parseInt(text.replace(/[^0-9]/g, ''));
+                if (!isNaN(num)) {
+                    let current = 0;
+                    const increment = Math.ceil(num / 60);
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= num) {
+                            current = num;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = current + (text.includes('+') ? '+' : '');
+                    }, 30);
+                }
+            });
+        }
+
+        if (statsSection) {
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !statsAnimated) {
+                        statsAnimated = true;
+                        animateCounters();
+                        statsObserver.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 });
+            statsObserver.observe(statsSection);
+        }
+
+        console.log('✅ Index page loaded with session check');
+    </script>
+</body>
+</html>
