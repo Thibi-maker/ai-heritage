@@ -275,6 +275,120 @@ app.post('/api/log', requireAuth, async (req, res) => {
     res.json({ success: true });
 });
 
+// ---------- OAUTH ROUTES ----------
+
+// Google OAuth 2.0
+app.get('/auth/google', (req, res) => {
+    const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
+    const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+    const scopes = 'profile email';
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', scopes);
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'select_account');
+    authUrl.searchParams.set('state', 'login');
+    res.redirect(authUrl.toString());
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+    const { code, state } = req.query || {};
+    if (!code) return res.status(400).json({ success: false, error: 'Authorization code not received' });
+
+    try {
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                code: code,
+                client_id: process.env.GOOGLE_OAUTH_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
+                client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET',
+                redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+                grant_type: 'authorization_code'
+            })
+        });
+        const tokenData = await tokenResponse.json();
+        if (!tokenData.access_token) return res.status(400).json({ success: false, error: 'Failed to get access token' });
+
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+        });
+        const userInfo = await userInfoResponse.json();
+
+        const { rows: users } = await query(
+            'SELECT id, name, email FROM users WHERE email = $1',
+            [userInfo.email]
+        );
+
+        if (users.length) {
+            const token = newToken();
+            await query('INSERT INTO sessions (token, user_id, remember) VALUES ($1,$2,$3)', [token, users[0].id, false]);
+            res.json({ success: true, token, user: { id: users[0].id, name: users[0].name, email: users[0].email } });
+        } else {
+            res.json({ success: false, error: 'No account found with this email. Please register first.' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// GitHub OAuth 2.0
+app.get('/auth/github', (req, res) => {
+    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || 'YOUR_GITHUB_CLIENT_ID';
+    const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI || 'http://localhost:3000/auth/github/callback';
+    const authUrl = new URL('https://github.com/login/oauth/authorize');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('scope', 'read:user user:email');
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('state', 'login');
+    res.redirect(authUrl.toString());
+});
+
+app.get('/auth/github/callback', async (req, res) => {
+    const { code, state } = req.query || {};
+    if (!code) return res.status(400).json({ success: false, error: 'Authorization code not received' });
+
+    try {
+        const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: new URLSearchParams({
+                code: code,
+                client_id: process.env.GITHUB_OAUTH_CLIENT_ID || 'YOUR_GITHUB_CLIENT_ID',
+                client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET || 'YOUR_GITHUB_CLIENT_SECRET',
+                redirect_uri: process.env.GITHUB_OAUTH_REDIRECT_URI || 'http://localhost:3000/auth/github/callback'
+            })
+        });
+        const tokenData = await tokenResponse.json();
+        // GitHub returns URL-encoded string, parse it
+        const params = new URLSearchParams(tokenData);
+        const accessToken = params.get('access_token');
+        if (!accessToken) return res.status(400).json({ success: false, error: 'Failed to get access token' });
+
+        const userInfoResponse = await fetch('https://api.github.com/user', {
+            headers: { Authorization: `token ${accessToken}` }
+        });
+        const userInfo = await userInfoResponse.json();
+
+        const { rows: users } = await query(
+            'SELECT id, name, email FROM users WHERE email = $1',
+            [userInfo.email]
+        );
+
+        if (users.length) {
+            const token = newToken();
+            await query('INSERT INTO sessions (token, user_id, remember) VALUES ($1,$2,$3)', [token, users[0].id, false]);
+            res.json({ success: true, token, user: { id: users[0].id, name: users[0].name, email: users[0].email } });
+        } else {
+            res.json({ success: false, error: 'No account found with this email. Please register first.' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 app.get('/api/database', requireAuth, async (req, res) => {
     const count = async (sql, params = []) => parseInt((await query(sql, params)).rows[0].c);
 

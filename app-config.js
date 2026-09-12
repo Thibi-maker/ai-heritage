@@ -6,7 +6,7 @@
         localHosts.includes(window.location.hostname);
 
     window.apiUrl = function (path) {
-        if (isLocalDevelopment && window.location.port !== '3000') {
+        if (window.location.protocol === 'http:' && isLocalDevelopment && window.location.port !== '3000') {
             return backendOrigin + path;
         }
         return path;
