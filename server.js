@@ -480,15 +480,21 @@ app.get('/api/monuments', requireAuth, async (req, res) => {
 });
 
 // ---------- START ----------
-initDatabase().then(() => {
-    app.listen(PORT, () => {
-        console.log('========================================');
-        console.log('  AI Heritage server running');
-        console.log(`  URL : http://localhost:${PORT}`);
-        console.log('  DB  : Neon Postgres');
-        console.log('========================================');
+if (require.main === module) {
+    initDatabase().then(() => {
+        app.listen(PORT, () => {
+            console.log('========================================');
+            console.log('  AI Heritage server running');
+            console.log(`  URL : http://localhost:${PORT}`);
+            console.log('  DB  : Neon Postgres');
+            console.log('========================================');
+        });
+    }).catch(err => {
+        console.error('[db] Failed to initialize database:', err);
+        process.exit(1);
     });
-}).catch(err => {
-    console.error('[db] Failed to initialize database:', err);
-    process.exit(1);
-});
+}
+
+// ---------- EXPORT ----------
+module.exports = app;
+module.exports.initDatabase = initDatabase;
