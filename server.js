@@ -169,7 +169,7 @@ app.use((req, res, next) => {
     if (req.method === 'OPTIONS') return res.sendStatus(204);
     next();
 });
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------- AUTH MIDDLEWARE ----------
 async function requireAuth(req, res, next) {
