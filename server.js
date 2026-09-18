@@ -1,10 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const { Pool } = require('pg');
 const crypto = require('crypto');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const DATABASE_URL = process.env.DATABASE_URL || 'REDACTED';
+const DATABASE_URL = process.env.DATABASE_URL;
 
 // ---------- DATABASE SETUP ----------
 const pool = new Pool({ connectionString: DATABASE_URL });
@@ -294,8 +296,11 @@ app.get('/auth/google', (req, res) => {
 });
 
 app.get('/auth/google/callback', async (req, res) => {
-    const { code, state } = req.query || {};
-    if (!code) return res.status(400).json({ success: false, error: 'Authorization code not received' });
+    const { code } = req.query || {};
+
+    if (!code) {
+        return res.status(400).send('Authorization code not received');
+    }
 
     try {
         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -303,18 +308,29 @@ app.get('/auth/google/callback', async (req, res) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 code: code,
-                client_id: process.env.GOOGLE_OAUTH_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
-                client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET',
-                redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+                client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+                client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+                redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URI,
                 grant_type: 'authorization_code'
             })
         });
-        const tokenData = await tokenResponse.json();
-        if (!tokenData.access_token) return res.status(400).json({ success: false, error: 'Failed to get access token' });
 
-        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-            headers: { Authorization: `Bearer ${tokenData.access_token}` }
-        });
+        const tokenData = await tokenResponse.json();
+
+        if (!tokenData.access_token) {
+            console.error('Google token error:', tokenData);
+            return res.status(400).send('Failed to get Google access token');
+        }
+
+        const userInfoResponse = await fetch(
+            'https://www.googleapis.com/oauth2/v2/userinfo',
+            {
+                headers: {
+                    Authorization: `Bearer ${tokenData.access_token}`
+                }
+            }
+        );
+
         const userInfo = await userInfoResponse.json();
 
         const { rows: users } = await query(
@@ -322,15 +338,47 @@ app.get('/auth/google/callback', async (req, res) => {
             [userInfo.email]
         );
 
-        if (users.length) {
-            const token = newToken();
-            await query('INSERT INTO sessions (token, user_id, remember) VALUES ($1,$2,$3)', [token, users[0].id, false]);
-            res.json({ success: true, token, user: { id: users[0].id, name: users[0].name, email: users[0].email } });
-        } else {
-            res.json({ success: false, error: 'No account found with this email. Please register first.' });
+        if (!users.length) {
+            return res.redirect(
+                '/login.html?error=' +
+                encodeURIComponent(
+                    'No account found with this email. Please register first.'
+                )
+            );
         }
+
+        const user = users[0];
+
+        const token = newToken();
+
+        await query(
+            'INSERT INTO sessions (token, user_id, remember) VALUES ($1,$2,$3)',
+            [token, user.id, true]
+        );
+
+        const session = {
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            },
+            token: token,
+            loginTime: new Date().toISOString(),
+            rememberMe: true
+        };
+
+        // Send the session to login.html temporarily.
+        const sessionData = encodeURIComponent(JSON.stringify(session));
+
+        res.redirect('/login.html?google_session=' + sessionData);
+
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Google OAuth error:', err);
+
+        res.redirect(
+            '/login.html?error=' +
+            encodeURIComponent('Google login failed. Please try again.')
+        );
     }
 });
 

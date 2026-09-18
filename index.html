@@ -124,38 +124,38 @@
             <h2 class="section-title">Key <span class="gradient-text">Features</span></h2>
             <p class="section-subtitle">Powered by advanced AI technology to protect our heritage</p>
 
-            <div class="features-grid">
-                <div class="feature-card" onclick="window.location.href='upload.html'">
+            <feature-icon>🧠</div>
+<div class="feature-card" onclick="window.location.href='upload.html'" tabindex="0" role="button" aria-label="AI Damage Detection - Advanced algorithms detect cracks, erosion, and structural damage with high precision">
                     <div class="feature-icon">🧠</div>
                     <h3>AI Damage Detection</h3>
                     <p>Advanced algorithms detect cracks, erosion, and structural damage with high precision.</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='upload.html'">
+                <div class="feature-card" onclick="window.location.href='upload.html'" tabindex="0" role="button" aria-label="Image Upload - Easily upload monument images for instant AI analysis and damage assessment">
                     <div class="feature-icon">📷</div>
                     <h3>Image Upload</h3>
                     <p>Easily upload monument images for instant AI analysis and damage assessment.</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='analysis.html'">
+                <feature-icon>📊</div>
+<div class="feature-card" onclick="window.location.href='analysis.html'" tabindex="0" role="button" aria-label="Damage Analysis - Comprehensive analysis reports with severity levels and confidence scores">
                     <div class="feature-icon">📊</div>
                     <h3>Damage Analysis</h3>
                     <p>Comprehensive analysis reports with severity levels and confidence scores.</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='report.html'">
+                <div class="feature-card" onclick="window.location.href='report.html'" tabindex="0" role="button" aria-label="Report Generation - Generate detailed PDF reports for preservation planning and documentation">
                     <div class="feature-icon">📄</div>
                     <h3>Report Generation</h3>
                     <p>Generate detailed PDF reports for preservation planning and documentation.</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='database.html'">
+                <div class="feature-card" onclick="window.location.href='database.html'" tabindex="0" role="button" aria-label="Heritage Database - Comprehensive database of monitored monuments with historical records">
                     <div class="feature-icon">🏛️</div>
                     <h3>Heritage Database</h3>
                     <p>Comprehensive database of monitored monuments with historical records.</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='security.html'">
+                <div class="feature-card" onclick="window.location.href='security.html'" tabindex="0" role="button" aria-label="Secure Data Storage - Enterprise-grade security for all your heritage preservation data">
                     <div class="feature-icon">🔒</div>
                     <h3>Secure Data Storage</h3>
                     <p>Enterprise-grade security for all your heritage preservation data.</p>
                 </div>
-            </div>
         </div>
     </section>
 
@@ -400,8 +400,7 @@
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-up');
-                    entry.target.style.opacity = '1';
+                    entry.target.classList.add('visible');
                     revealObserver.unobserve(entry.target);
                 }
             });
@@ -411,6 +410,20 @@
             el.style.opacity = '0';
             revealObserver.observe(el);
         });
+
+        // ---------- HERO SECTION ENTRANCE ----------
+        const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.hero-content h1, .hero-content p, .hero-buttons .btn-primary, .hero-buttons .btn-secondary, .hero-image-container').forEach(el => el.classList.add('visible'));
+                    heroObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+
+        if (document.querySelector('.hero')) {
+            heroObserver.observe(document.querySelector('.hero'));
+        }
 
         // ---------- COUNTER ANIMATION ----------
         const statsSection = document.querySelector('.statistics');

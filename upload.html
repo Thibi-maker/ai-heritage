@@ -19,11 +19,11 @@
                 <span class="logo-mark"><i class="fas fa-landmark"></i></span>
                 <span class="logo-text"><span class="logo-ai">AI</span>Heritage</span>
             </a>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="upload.html" class="active">Upload</a></li>
-                <li><a href="database.html">Database</a></li>
+            <ul class="nav-menu" id="navMenu" aria-label="Main navigation">
+                <li><a href="index.html" data-tooltip="Home">Home</a></li>
+                <li><a href="about.html" data-tooltip="About">About</a></li>
+                <li><a href="upload.html" class="active" data-tooltip="Upload">Upload</a></li>
+                <li><a href="database.html" data-tooltip="Database">Database</a></li>
             </ul>
             <div class="nav-actions">
                 <a href="profile.html" title="Profile" class="user-avatar">T</a>
@@ -47,7 +47,7 @@
                 </div>
             </div>
 
-            <div class="upload-box" id="uploadBox" role="button" tabindex="0" aria-label="Choose a heritage image to upload">
+            <div class="upload-box" id="uploadBox" role="button" tabindex="0" aria-label="Choose a heritage image to upload" data-tooltip="Upload heritage monument images for AI analysis">
                 <div class="upload-box-topline"><span>DROP ZONE</span><span>JPG · PNG · WEBP</span></div>
                 <div class="icon">📷</div>
                 <h3>Drop your image here</h3>

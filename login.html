@@ -417,13 +417,57 @@
             });
         }
         // ---------- CHECK EXISTING SESSION ----------
-        document.addEventListener('DOMContentLoaded', () => {
-            const session = getAiHeritageSession();
-            
-            if (session) {
-                window.location.href = 'dashboard.html';
-            }
-        });
+       document.addEventListener('DOMContentLoaded', () => {
+
+    // ---------- HANDLE GOOGLE LOGIN ----------
+    const params = new URLSearchParams(window.location.search);
+    const googleSession = params.get('google_session');
+    const googleError = params.get('error');
+
+    if (googleError) {
+        const alertEl = document.getElementById('alertMessage');
+
+        alertEl.className = 'alert error';
+        alertEl.textContent = googleError;
+
+        // Remove error from URL
+        window.history.replaceState({}, document.title, 'login.html');
+    }
+
+    if (googleSession) {
+        try {
+            const session = JSON.parse(decodeURIComponent(googleSession));
+
+            // Save Google login session
+            localStorage.setItem(
+                'aiHeritageSession',
+                JSON.stringify(session)
+            );
+
+            // Remove session data from URL
+            window.history.replaceState({}, document.title, 'login.html');
+
+            // Redirect to dashboard
+            window.location.href = 'index.html';
+
+        } catch (error) {
+            console.error('Google session error:', error);
+
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.className = 'alert error';
+            alertEl.textContent = 'Google login failed. Please try again.';
+        }
+
+        return;
+    }
+
+    // ---------- CHECK EXISTING SESSION ----------
+    const session = getAiHeritageSession();
+
+    if (session) {
+        window.location.href = 'index.html'; 
+    }
+});
 
         console.log('\u2705 Login page loaded');
     </script>
